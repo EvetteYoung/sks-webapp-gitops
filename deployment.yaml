@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-deployment
+  namespace: sks-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        # 初始镜像地址，指向您的Harbor和项目
+        image: 192.168.16.65/sks-demo/webapp:v1.0 
+        ports:
+        - containerPort: 5000
+        env:
+          - name: DB_HOST
+            value: "mysql-demo.mysql-db.svc.cluster.local"
+          - name: DB_NAME
+            value: "demodb"
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: mysql-creds # 我们将要创建的secret
+                key: username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-creds # 我们将要创建的secret
+                key: password
